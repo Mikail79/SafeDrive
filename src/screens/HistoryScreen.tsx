@@ -85,7 +85,7 @@ export const HistoryScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: '#fff', marginTop: 20 },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',

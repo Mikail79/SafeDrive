@@ -40,7 +40,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
               <Icon
                 name="play"
                 size={60}
-                color="#40BFFF"
+                color="#FFF"
                 style={{ marginLeft: 8 }}
               />
             </TouchableOpacity>
@@ -50,7 +50,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
       <View style={styles.bottomSection}>
         <Text style={styles.premiumText}>Akun anda harus premium</Text>
         <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Real time monitoring</Text>
+          <Text style={styles.toggleLabel}>Aktifkan mode pengawasan</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Premium')}>
             <Icon name="toggle" size={40} color="#ccc" />
           </TouchableOpacity>
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: '#fff',
+    backgroundColor: '#40BFFF',
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 10,

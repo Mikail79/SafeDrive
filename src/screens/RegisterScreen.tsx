@@ -53,11 +53,11 @@ const RegisterScreen = ({ navigation }: any) => {
 
         {/* FORM */}
         <View style={styles.form}>
-          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.title}>Buat akun</Text>
 
           {/* Full Name */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Full Name</Text>
+            <Text style={styles.label}>Nama Lengkap</Text>
             {/* LOGIKA STYLE: Jika aktif, pakai style tambahan 'inputActive' */}
             <View
               style={[
@@ -72,7 +72,7 @@ const RegisterScreen = ({ navigation }: any) => {
                 onFocus={() => setActiveInput('name')}
                 // Event saat selesai/keluar (Blur)
                 onBlur={() => setActiveInput(null)}
-                placeholder="Enter your name..."
+                placeholder="John Doe"
                 placeholderTextColor="#C6C6C6"
                 autoCapitalize="words"
                 style={styles.input}
@@ -82,7 +82,7 @@ const RegisterScreen = ({ navigation }: any) => {
 
           {/* Email */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Alamat email</Text>
             <View
               style={[
                 styles.inputBox,
@@ -94,7 +94,7 @@ const RegisterScreen = ({ navigation }: any) => {
                 onChangeText={setEmail}
                 onFocus={() => setActiveInput('email')}
                 onBlur={() => setActiveInput(null)}
-                placeholder="email@example.com"
+                placeholder="JohnDoe@contoh.com"
                 placeholderTextColor="#C6C6C6"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -105,7 +105,7 @@ const RegisterScreen = ({ navigation }: any) => {
 
           {/* Password */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Kata sandi</Text>
             <View
               style={[
                 styles.inputBoxRow,
@@ -117,7 +117,7 @@ const RegisterScreen = ({ navigation }: any) => {
                 onChangeText={setPassword}
                 onFocus={() => setActiveInput('password')}
                 onBlur={() => setActiveInput(null)}
-                placeholder="Create a password..."
+                placeholder="johndoe1324"
                 placeholderTextColor="#C6C6C6"
                 secureTextEntry={!showPassword}
                 style={styles.input}
@@ -141,7 +141,7 @@ const RegisterScreen = ({ navigation }: any) => {
             onPress={() => navigation.navigate('Login')}
             activeOpacity={0.7} // Efek tombol ditekan (transparan)
           >
-            <Text style={styles.buttonText}>Sign Up</Text>
+            <Text style={styles.buttonText}>Daftar Akun</Text>
             <Icon
               name="arrow-forward"
               size={18}
@@ -152,9 +152,11 @@ const RegisterScreen = ({ navigation }: any) => {
 
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
+            <Text style={styles.footerText}>
+              Apakah kamu sudah memiliki akun?{' '}
+            </Text>
             <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.footerLink}>Sign In</Text>
+              <Text style={styles.footerLink}>Masuk</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -250,7 +252,7 @@ const styles = StyleSheet.create({
 
   // STYLE SAAT AKTIF / DIKLIK (Fokus)
   inputActive: {
-    borderColor: '#FF9F43', // WARNA ORANYE (Sesuai nuansa Figma)
+    borderColor: '#1f9bfa55', // WARNA ORANYE (Sesuai nuansa Figma)
     // Atau gunakan '#40BFFF' jika ingin warna Biru
     backgroundColor: '#FFF',
     elevation: 5, // Shadow lebih menonjol saat aktif

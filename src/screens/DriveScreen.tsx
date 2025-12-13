@@ -67,7 +67,7 @@ const DriveScreen = ({ navigation }: any) => {
     <View style={styles.container}>
       {/* PERBAIKAN 2: Menghapus semua { ' ' } yang menyebabkan error */}
       <StatusBar hidden />
-      
+
       <View style={styles.cameraPlaceholder}>
         <Text style={styles.placeholderText}>LIVE CAMERA FEED</Text>
         {isRecording && (
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     alignItems: 'center',
-    paddingBottom: 20,
+    paddingBottom: 40,
   },
   controlPanel: {
     flexDirection: 'row',
