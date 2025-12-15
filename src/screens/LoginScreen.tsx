@@ -13,8 +13,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
-import LoginIcon from "../assets/icons/moni_login_icon.svg";
-
+import LoginIcon from '../assets/icons/moni_login_icon.svg';
 
 const { width } = Dimensions.get('window');
 
@@ -22,6 +21,8 @@ const LoginScreen = ({ navigation }: any) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  // STATE PENTING: Untuk melacak input mana yang sedang diklik (Fokus)
+  const [activeInput, setActiveInput] = useState<string | null>(null);
 
   const { login } = useAuth();
 
@@ -54,17 +55,24 @@ const LoginScreen = ({ navigation }: any) => {
 
         {/* FORM */}
         <View style={styles.form}>
-          <Text style={styles.title}>Sign In To SafeDrive</Text>
+          <Text style={styles.title}>Masuk ke SafeDrive</Text>
 
           {/* Email */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email Address</Text>
+            <Text style={styles.label}>Alamat email</Text>
 
-            <View style={styles.inputBox}>
+            <View
+              style={[
+                styles.inputBoxRow,
+                activeInput === 'email' && styles.inputActive,
+              ]}
+            >
               <TextInput
                 value={email}
                 onChangeText={setEmail}
-                placeholder="princessangelya@gmail.com"
+                onFocus={() => setActiveInput('email')}
+                onBlur={() => setActiveInput(null)}
+                placeholder="JohnDoe@contoh.com"
                 placeholderTextColor="#C6C6C6"
                 keyboardType="email-address"
                 autoCapitalize="none"
@@ -75,13 +83,20 @@ const LoginScreen = ({ navigation }: any) => {
 
           {/* Password */}
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Password</Text>
+            <Text style={styles.label}>Kata sandi</Text>
 
-            <View style={styles.inputBoxRow}>
+            <View
+              style={[
+                styles.inputBoxRow,
+                activeInput === 'password' && styles.inputActive,
+              ]}
+            >
               <TextInput
                 value={password}
                 onChangeText={setPassword}
-                placeholder="Enter your password..."
+                onFocus={() => setActiveInput('password')}
+                onBlur={() => setActiveInput(null)}
+                placeholder="johndoe1324"
                 placeholderTextColor="#C6C6C6"
                 secureTextEntry={!showPassword}
                 style={styles.input}
@@ -102,7 +117,7 @@ const LoginScreen = ({ navigation }: any) => {
 
           {/* Sign In Button */}
           <TouchableOpacity style={styles.button} onPress={login}>
-            <Text style={styles.buttonText}>Sign In</Text>
+            <Text style={styles.buttonText}>Masuk</Text>
             <Icon
               name="arrow-forward"
               size={18}
@@ -111,24 +126,21 @@ const LoginScreen = ({ navigation }: any) => {
             />
           </TouchableOpacity>
 
-          {/* Google */}
-          <TouchableOpacity style={styles.googleBtn}>
-            <Icon name="logo-google" size={25} color="#333" />
-          </TouchableOpacity>
-
           {/* Footer */}
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
+            <Text style={styles.footerText}>
+              Apakah anda belum memiliki akun?{' '}
+            </Text>
             <Text
               onPress={() => navigation.navigate('Register')}
               style={styles.footerLink}
             >
-              Sign Up
+              Daftar
             </Text>
           </View>
 
           <TouchableOpacity>
-            <Text style={styles.forgot}>Forgot Password</Text>
+            <Text style={styles.forgot}>Lupa kata sandi</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -229,6 +241,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
+  inputActive: {
+    borderColor: '#1f9bfa55',
+    backgroundColor: '#FFF',
+    elevation: 5, // Shadow lebih menonjol saat aktif
+    shadowOpacity: 0.1,
+  },
 
   eyeToggle: {
     padding: 10,
@@ -259,24 +277,6 @@ const styles = StyleSheet.create({
 
   buttonIcon: {
     marginLeft: 10,
-  },
-
-  googleBtn: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#eee',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
-
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
   },
 
   footer: {

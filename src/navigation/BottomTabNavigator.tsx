@@ -15,12 +15,12 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 // Pindahkan logika ikon ke komponen terpisah agar tidak didefinisikan saat render
-const TabBarIcon: React.FC<{ routeName: keyof TabParamList; focused: boolean; color: string; size: number }> = ({
-  routeName,
-  focused,
-  color,
-  size,
-}) => {
+const TabBarIcon: React.FC<{
+  routeName: keyof TabParamList;
+  focused: boolean;
+  color: string;
+  size: number;
+}> = ({ routeName, focused, color, size }) => {
   let iconName: string = 'circle';
 
   if (routeName === 'Beranda') {
@@ -41,22 +41,27 @@ export const BottomTabNavigator = () => {
       screenOptions={({ route }) => ({
         headerShown: false, // Sembunyikan header di setiap tab
         tabBarIcon: ({ focused, color, size }) => {
-          return <TabBarIcon routeName={route.name as keyof TabParamList} focused={focused} color={color} size={size} />;
+          return (
+            <TabBarIcon
+              routeName={route.name as keyof TabParamList}
+              focused={focused}
+              color={color}
+              size={size}
+            />
+          );
         },
         tabBarActiveTintColor: '#40BFFF', // Warna Biru Cerah (Sesuai Figma) saat aktif
         tabBarInactiveTintColor: 'gray', // Warna abu-abu saat tidak aktif
-        tabBarStyle: { 
+        tabBarStyle: {
           backgroundColor: '#fff', // Latar belakang putih bersih
-          borderTopWidth: 1,      // Garis tipis di atas tab bar
+          borderTopWidth: 1, // Garis tipis di atas tab bar
           borderTopColor: '#f0f0f0',
-          height: 60,             // Tinggi tab bar sedikit lebih besar agar nyaman
-          paddingBottom: 10,      // Jarak padding bawah
-          paddingTop: 10,
+          height: 60, // Tinggi tab bar sedikit lebih besar agar nyaman
         },
         tabBarLabelStyle: {
-          fontSize: 12,           // Ukuran font label
+          fontSize: 12, // Ukuran font label
           fontWeight: '500',
-        }
+        },
       })}
     >
       {/* Urutan Tab: Beranda (Kiri), Riwayat (Tengah), Profil (Kanan) */}

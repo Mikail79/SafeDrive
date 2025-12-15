@@ -11,7 +11,6 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-
 const ProfileScreen = ({ navigation }: any) => {
   const { logout } = useAuth();
 
@@ -70,7 +69,7 @@ const ProfileScreen = ({ navigation }: any) => {
           <TouchableOpacity
             style={styles.upgradeButton}
             // Pastikan screen 'Premium' sudah terdaftar di MainNavigator.tsx
-            onPress={() => navigation.navigate('Premium')} 
+            onPress={() => navigation.navigate('Premium')}
           >
             <Text style={styles.upgradeText}>Beralih ke premium</Text>
           </TouchableOpacity>
@@ -97,7 +96,7 @@ const ProfileScreen = ({ navigation }: any) => {
 export default ProfileScreen;
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#f9f9f9' },
+  container: { flex: 1, backgroundColor: '#f9f9f9', marginTop: 20 },
   scroll: { padding: 20 },
   sectionTitle: {
     fontSize: 16,
