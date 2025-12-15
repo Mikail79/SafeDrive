@@ -66,8 +66,8 @@ export const BottomTabNavigator = () => {
     >
       {/* Urutan Tab: Beranda (Kiri), Riwayat (Tengah), Profil (Kanan) */}
       {/* Anda bisa mengubah urutan ini sesuai keinginan */}
-      <Tab.Screen name="Riwayat" component={HistoryScreen} />
       <Tab.Screen name="Beranda" component={HomeScreen} />
+      <Tab.Screen name="Riwayat" component={HistoryScreen} />
       <Tab.Screen name="Profil" component={ProfileScreen} />
     </Tab.Navigator>
   );
