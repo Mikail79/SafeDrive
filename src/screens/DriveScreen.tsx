@@ -619,52 +619,189 @@
 //     padding: 14,
 //   },
 // });
+
 // berhasil
 
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+// import React, { useEffect, useState } from 'react';
+// import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native';
+// import Icon from 'react-native-vector-icons/Ionicons';
+
+// import {
+//   Camera,
+//   useCameraDevice,
+//   useFrameProcessor,
+// } from 'react-native-vision-camera';
+
+// import { useFaceDetector } from 'react-native-vision-camera-face-detector';
+
+// const DriveScreen = () => {
+//   const device = useCameraDevice('front');
+
+//   const [isActive, setIsActive] = useState(true);
+//   const [hasPermission, setHasPermission] = useState(false);
+
+//   /* =====================
+//    * FACE DETECTOR
+//    * ===================== */
+//   const faceDetector = useFaceDetector({
+//     performanceMode: 'fast',
+//     classificationMode: 'all',
+//   });
+
+//   /* =====================
+//    * FRAME PROCESSOR
+//    * ===================== */
+//   const frameProcessor = useFrameProcessor(
+//     frame => {
+//       'worklet';
+
+//       const faces = faceDetector.detectFaces(frame);
+
+//       // ✅ DEBUG WORKLET (AMAN)
+//       if (faces.length > 0) {
+//         console.log('[FRAME]', 'FACE DETECTED:', faces.length);
+//       } else {
+//         console.log('[FRAME]', 'NO FACE');
+//       }
+//     },
+//     [faceDetector],
+//   );
+
+//   /* =====================
+//    * CAMERA PERMISSION
+//    * ===================== */
+//   useEffect(() => {
+//     (async () => {
+//       const status = await Camera.getCameraPermissionStatus();
+//       if (status !== 'granted') {
+//         const req = await Camera.requestCameraPermission();
+//         setHasPermission(req === 'granted');
+//       } else {
+//         setHasPermission(true);
+//       }
+//     })();
+//   }, []);
+
+//   /* =====================
+//    * UI
+//    * ===================== */
+//   return (
+//     <SafeAreaView style={styles.container}>
+//       {device && hasPermission && (
+//         <Camera
+//           style={StyleSheet.absoluteFill}
+//           device={device}
+//           isActive={isActive}
+//           frameProcessor={frameProcessor}
+//           // frameProcessorFps={5}
+//         />
+//       )}
+
+//       <View style={styles.overlay}>
+//         <TouchableOpacity
+//           style={styles.button}
+//           onPress={() => setIsActive(!isActive)}
+//         >
+//           <Icon
+//             name={isActive ? 'stop-circle' : 'play-circle'}
+//             size={64}
+//             color="#fff"
+//           />
+//         </TouchableOpacity>
+//       </View>
+//     </SafeAreaView>
+//   );
+// };
+
+// export default DriveScreen;
+
+// /* =====================
+//  * STYLES
+//  * ===================== */
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#000',
+//   },
+//   overlay: {
+//     position: 'absolute',
+//     bottom: 40,
+//     alignSelf: 'center',
+//   },
+//   button: {
+//     backgroundColor: '#1e88e5',
+//     borderRadius: 60,
+//     padding: 14,
+//   },
+// });
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+  TouchableOpacity,
+} from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import {
   Camera,
+  runAsync,
   useCameraDevice,
   useFrameProcessor,
 } from 'react-native-vision-camera';
 
-import { useFaceDetector } from 'react-native-vision-camera-face-detector';
+import {
+  Face,
+  FrameFaceDetectionOptions,
+  useFaceDetector,
+} from 'react-native-vision-camera-face-detector';
+
+import { Worklets } from 'react-native-worklets-core';
+
+/* =====================
+ * THRESHOLD KONFIGURASI
+ * ===================== */
+const EYE_CLOSED_THRESHOLD = 0.25;
+const SMILE_THRESHOLD = 0.6;
 
 const DriveScreen = () => {
   const device = useCameraDevice('front');
 
-  const [isActive, setIsActive] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
+  const [isActive, setIsActive] = useState(true);
+
+  const [eyeStatus, setEyeStatus] = useState<
+    'Terbuka' | 'Tertutup' | 'Tidak Terdeteksi'
+  >('Tidak Terdeteksi');
+  const [mouthStatus, setMouthStatus] = useState<
+    'Senyum' | 'Tidak Senyum' | 'Tidak Terdeteksi'
+  >('Tidak Terdeteksi');
+
+  const [isFaceDetected, setIsFaceDetected] = useState(false);
+  const [duration, setDuration] = useState(0); // dalam detik
 
   /* =====================
-   * FACE DETECTOR
+   * FACE DETECTOR OPTIONS
    * ===================== */
-  const faceDetector = useFaceDetector({
+  const faceDetectionOptions = useRef<FrameFaceDetectionOptions>({
     performanceMode: 'fast',
+    landmarkMode: 'all',
     classificationMode: 'all',
-  });
+    contourMode: 'none',
+    trackingEnabled: false,
+  }).current;
+
+  const { detectFaces, stopListeners } = useFaceDetector(faceDetectionOptions);
 
   /* =====================
-   * FRAME PROCESSOR
+   * CLEANUP
    * ===================== */
-  const frameProcessor = useFrameProcessor(
-    frame => {
-      'worklet';
-
-      const faces = faceDetector.detectFaces(frame);
-
-      // ✅ DEBUG WORKLET (AMAN)
-      if (faces.length > 0) {
-        console.log('[FRAME]', 'FACE DETECTED:', faces.length);
-      } else {
-        console.log('[FRAME]', 'NO FACE');
-      }
-    },
-    [faceDetector],
-  );
+  useEffect(() => {
+    return () => {
+      stopListeners();
+    };
+  }, [stopListeners]);
 
   /* =====================
    * CAMERA PERMISSION
@@ -681,21 +818,186 @@ const DriveScreen = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    if (isActive) {
+      timerRef.current = setInterval(() => {
+        setDuration(prev => prev + 1);
+      }, 1000);
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [isActive]);
+
+  /* =====================
+   * RUN ON JS HANDLER
+   * ===================== */
+  const eyeClosedStartRef = useRef<number | null>(null);
+  const smileStartRef = useRef<number | null>(null);
+  const timerRef = useRef<number | null>(null);
+
+  const handleFaceResult = Worklets.createRunOnJS((faces: Face[]) => {
+    const now = Date.now();
+    if (faces.length === 0) {
+      setIsFaceDetected(false);
+      setEyeStatus('Tidak Terdeteksi');
+      setMouthStatus('Tidak Terdeteksi');
+      return;
+    }
+    setIsFaceDetected(true);
+
+    const face = faces[0];
+
+    /* ===== EYE DETECTION ===== */
+    /* ===== EYE DETECTION (STABLE) ===== */
+    const leftEye = face.leftEyeOpenProbability ?? 1;
+    const rightEye = face.rightEyeOpenProbability ?? 1;
+
+    const eyesClosed =
+      leftEye < EYE_CLOSED_THRESHOLD && rightEye < EYE_CLOSED_THRESHOLD;
+
+    if (eyesClosed) {
+      if (!eyeClosedStartRef.current) {
+        eyeClosedStartRef.current = now;
+      }
+
+      const duration = now - eyeClosedStartRef.current;
+
+      // ⏱️ HARUS TERTUTUP > 700ms
+      if (duration > 700) {
+        setEyeStatus('Tertutup');
+      }
+    } else {
+      eyeClosedStartRef.current = null;
+      setEyeStatus('Terbuka');
+    }
+
+    /* ===== SMILE DETECTION ===== */
+    const smileProb = face.smilingProbability;
+
+    if (smileProb == null) {
+      smileStartRef.current = null;
+      setMouthStatus('Tidak Terdeteksi');
+    } else if (smileProb > SMILE_THRESHOLD) {
+      if (!smileStartRef.current) {
+        smileStartRef.current = now;
+      }
+
+      if (now - smileStartRef.current > 400) {
+        setMouthStatus('Senyum');
+      }
+    } else {
+      smileStartRef.current = null;
+      setMouthStatus('Tidak Senyum');
+    }
+  });
+
+  /* =====================
+   * FRAME PROCESSOR
+   * ===================== */
+  const frameProcessor = useFrameProcessor(
+    frame => {
+      'worklet';
+
+      runAsync(frame, () => {
+        'worklet';
+        const faces = detectFaces(frame);
+        handleFaceResult(faces);
+      });
+    },
+    [handleFaceResult],
+  );
+  const formatDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   /* =====================
    * UI
    * ===================== */
+  if (!device || !hasPermission) {
+    return (
+      <SafeAreaView style={styles.center}>
+        <Text style={{ color: '#fff' }}>Camera not ready</Text>
+      </SafeAreaView>
+    );
+  }
+  const getEyeColor = () => {
+    if (eyeStatus === 'Tertutup') return '#ff5252';
+    if (eyeStatus === 'Terbuka') return '#4caf50';
+    return '#9e9e9e';
+  };
+
+  const getMouthColor = () => {
+    if (mouthStatus === 'Senyum') return '#ffc107';
+    if (mouthStatus === 'Tidak Senyum') return '#4caf50';
+    return '#9e9e9e';
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      {device && hasPermission && (
-        <Camera
-          style={StyleSheet.absoluteFill}
-          device={device}
-          isActive={isActive}
-          frameProcessor={frameProcessor}
-          // frameProcessorFps={5}
-        />
-      )}
+      <Camera
+        style={StyleSheet.absoluteFill}
+        device={device}
+        isActive={isActive}
+        frameProcessor={frameProcessor}
+        // frameProcessorFps={5}
+      />
 
+      {/* ===== STATUS OVERLAY ===== */}
+
+      <View style={styles.statusPanel}>
+        <Text style={styles.panelTitle}>SAFE DRIVE</Text>
+
+        <View style={styles.statusRow}>
+          <Icon name="person-outline" size={18} color="#fff" />
+          <Text style={styles.label}>Wajah</Text>
+          <Text
+            style={[
+              styles.value,
+              { color: isFaceDetected ? '#4caf50' : '#ff5252' },
+            ]}
+          >
+            {isFaceDetected ? 'Terdeteksi' : 'Tidak Terdeteksi'}
+          </Text>
+        </View>
+
+        <View style={styles.statusRow}>
+          <Icon name="eye-outline" size={18} color={getEyeColor()} />
+          <Text style={styles.label}>Mata</Text>
+          <Text style={[styles.value, { color: getEyeColor() }]}>
+            {eyeStatus}
+          </Text>
+        </View>
+
+        <View style={styles.statusRow}>
+          <Icon name="happy-outline" size={18} color={getMouthColor()} />
+          <Text style={styles.label}>Mulut</Text>
+          <Text style={[styles.value, { color: getMouthColor() }]}>
+            {mouthStatus}
+          </Text>
+        </View>
+
+        <View style={styles.divider} />
+
+        <View style={styles.statusRow}>
+          <Icon name="time-outline" size={18} color="#90caf9" />
+          <Text style={styles.label}>Durasi</Text>
+          <Text style={styles.value}>{formatDuration(duration)}</Text>
+        </View>
+      </View>
+
+      {/* ===== CONTROL ===== */}
       <View style={styles.overlay}>
         <TouchableOpacity
           style={styles.button}
@@ -718,9 +1020,60 @@ export default DriveScreen;
  * STYLES
  * ===================== */
 const styles = StyleSheet.create({
+  statusPanel: {
+    position: 'absolute',
+    top: 40,
+    left: 16,
+    width: 220,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.1)',
+  },
+
+  panelTitle: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '700',
+    marginBottom: 10,
+    letterSpacing: 1,
+  },
+
+  statusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  label: {
+    flex: 1,
+    color: '#ccc',
+    fontSize: 13,
+    marginLeft: 8,
+  },
+
+  value: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  divider: {
+    height: 1,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    marginVertical: 8,
+  },
+
   container: {
     flex: 1,
     backgroundColor: '#000',
+  },
+  center: {
+    flex: 1,
+    backgroundColor: '#000',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   overlay: {
     position: 'absolute',
@@ -731,5 +1084,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#1e88e5',
     borderRadius: 60,
     padding: 14,
+  },
+  statusBox: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    borderRadius: 12,
+    padding: 12,
+  },
+  statusItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  statusText: {
+    color: '#fff',
+    marginLeft: 8,
+    fontSize: 14,
   },
 });
