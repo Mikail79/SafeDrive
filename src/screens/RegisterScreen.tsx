@@ -423,12 +423,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
   },
 
-  input: {
-    flex: 1,
-    fontSize: 14,
-    color: '#333',
-  },
-
   eyeToggle: {
     padding: 10,
     marginRight: 5,
